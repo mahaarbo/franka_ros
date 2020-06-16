@@ -1,4 +1,4 @@
-float64[16] EE_T_K
+float64[16] ee_t_k
 ---
 bool success
 string error
