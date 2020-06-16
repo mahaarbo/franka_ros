@@ -1,12 +1,14 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.5)
 project(franka_description)
 
-find_package(catkin REQUIRED)
-catkin_package(CATKIN_DEPENDS xacro)
+find_package(ament_cmake REQUIRED)
+
 
 install(DIRECTORY meshes
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  DESTINATION share/${PROJECT_NAME}
 )
 install(DIRECTORY robots
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  DESTINATION share/${PROJECT_NAME}
 )
+
+ament_package()
