@@ -1,4 +1,4 @@
-float64[16] F_T_EE
+float64[16] f_t_ee
 ---
 bool success
 string error
