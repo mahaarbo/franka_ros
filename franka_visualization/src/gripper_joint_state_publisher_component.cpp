@@ -1,25 +1,20 @@
 // Author: Mathias Hauan Arbo
 // Department of Engineering Cybernetics, NTNU, 2020
 // Based on the work of Franka Emika
-#include "franka_visualization/robot_joint_state_publisher_component.hpp"
+#include "franka_visualization/gripper_joint_state_publisher_component.hpp"
 
 namespace franka_visualization
 {
 using namespace std::chrono_literals;
 
-RobotJointStatePublisher::RobotJointStatePublisher(const rclcpp::NodeOptions & options)
-: Node("robot_joint_state_publisher")
+GripperJointStatePublisher::GripperJointStatePublisher(const rclcpp::NodeOptions & options)
+: Node("gripper_joint_state_publisher")
 {
     this->declare_parameter<std::string>("robot_ip", "172.16.0.2");
-    this->declare_parameter<std::vector<std::string>>("joint_names",
+    this->declare_parameter<std::vector<std::string>>("joint_names", 
         {
-            "panda_joint1",
-            "panda_joint2",
-            "panda_joint3",
-            "panda_joint4",
-            "panda_joint5",
-            "panda_joint6",
-            "panda_joint7"
+            "panda_finger_joint1",
+            "panda_finger_joint2"
         }
     );
     this->declare_parameter<double>("publish_rate", 30.);
@@ -28,29 +23,28 @@ RobotJointStatePublisher::RobotJointStatePublisher(const rclcpp::NodeOptions & o
     joint_names = parameters_client->get_parameter<std::vector<std::string>>("joint_names");
     publish_rate = parameters_client->get_parameter<double>("publish_rate");
     
-    // Initialize joint_state message
+    // Initialize joint state message
     current_joint_state.name = joint_names;
-    current_joint_state.position = {0., 0., 0., 0., 0., 0., 0.};
-    current_joint_state.velocity = {0., 0., 0., 0., 0., 0., 0.};
-    current_joint_state.effort = {0., 0., 0., 0., 0., 0., 0.};
+    current_joint_state.position = {0., 0.};
+    current_joint_state.velocity = {0., 0.};
+    current_joint_state.effort = {0., 0.};
     RCLCPP_INFO(this->get_logger(), "Establishing connection to Franka Controller.");
-    robot = std::make_shared<franka::Robot>(robot_ip);
+    gripper = std::make_shared<franka::Gripper>(robot_ip);
     publisher = create_publisher<sensor_msgs::msg::JointState>("joint_states", 1);
     timer = create_wall_timer(
         std::chrono::duration<double>(1./publish_rate),
-        std::bind(&RobotJointStatePublisher::on_timer, this)
+        std::bind(&GripperJointStatePublisher::on_timer, this)
     );
+
 }
 
-void RobotJointStatePublisher::on_timer()
+void GripperJointStatePublisher::on_timer()
 {
     current_joint_state.header.stamp = rclcpp::Clock().now();
-    current_robot_state = robot->readOnce();
+    current_gripper_state = gripper->readOnce();
     for (size_t i = 0; i < joint_names.size(); i++)
     {
-        current_joint_state.position[i] = current_robot_state.q[i];
-        current_joint_state.velocity[i] = current_robot_state.dq[i];
-        current_joint_state.effort[i] = current_robot_state.tau_J[i];
+        current_joint_state.position[i] = current_gripper_state.width * 0.5;
     }
     publisher->publish(current_joint_state);
 }
@@ -58,4 +52,4 @@ void RobotJointStatePublisher::on_timer()
 } //namespace franka_visualization
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(franka_visualization::RobotJointStatePublisher)
+RCLCPP_COMPONENTS_REGISTER_NODE(franka_visualization::GripperJointStatePublisher)
