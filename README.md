@@ -4,6 +4,13 @@
 
 See the [Franka Control Interface (FCI) documentation][fci-docs] for more information.
 
+## ROS 2
+`libfranka` must be installed locally and you must use the correct version. Use the cmake cache entry `-DFranka_DIR:PATH=/path/to/libfranka/build`.
+
+As xacro integration in ros2 is not complete for python-based launch scripts, urdfs are included for Franka Emika Panda with and without gripper. 
+
+For ROS 2 Eloquent and Dashing, there are URDFs included instead of using the xacro. For Foxy and above, the `command` method can be used to generate the URDFs from the xacro. 
+
 ## License
 
 All packages of `franka_ros` are licensed under the [Apache 2.0 license][apache-2.0].
