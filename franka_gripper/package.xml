@@ -1,28 +1,32 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model 
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>franka_gripper</name>
   <version>0.7.0</version>
   <description>This package implements the franka gripper of type Franka Hand for the use in ros</description>
   <maintainer email="support@franka.de">Franka Emika GmbH</maintainer>
   <license>Apache 2.0</license>
 
-  <url type="website">http://wiki.ros.org/franka_gripper</url>
+  <url type="website">http://wiki.ros.org/franka_msgs</url>
   <url type="repository">https://github.com/frankaemika/franka_ros</url>
   <url type="bugtracker">https://github.com/frankaemika/franka_ros/issues</url>
   <author>Franka Emika GmbH</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
 
-  <depend>roscpp</depend>
-  <depend>message_generation</depend>
-  <depend>libfranka</depend>
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
   <depend>control_msgs</depend>
-  <depend>actionlib</depend>
-  <depend>sensor_msgs</depend>
-  <depend>xmlrpcpp</depend>
-  <depend>actionlib_msgs</depend>
+  <depend>action_msgs</depend>
+  <depend>builtin_interfaces</depend>
 
-  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
 
-  <build_export_depend>message_runtime</build_export_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

@@ -1,121 +1,79 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.5)
 project(franka_gripper)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  message_generation
-  control_msgs
-  actionlib
-  sensor_msgs
-  xmlrpcpp
-  actionlib_msgs
-)
-
-find_package(Franka 0.7.0 REQUIRED)
-
-add_action_files(
-  DIRECTORY action
-  FILES Grasp.action
-        Homing.action
-        Stop.action
-        Move.action
-)
-
-add_message_files(
-  DIRECTORY msg
-  FILES GraspEpsilon.msg
-)
-
-generate_messages(DEPENDENCIES actionlib_msgs)
-
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES franka_gripper
-  CATKIN_DEPENDS roscpp
-                 message_runtime
-                 control_msgs
-                 actionlib
-                 sensor_msgs
-                 xmlrpcpp
-                 actionlib_msgs
-  DEPENDS Franka
-)
-
-add_library(franka_gripper
-  src/franka_gripper.cpp
-)
-
-add_dependencies(franka_gripper
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-  ${PROJECT_NAME}_generate_messages_cpp
-)
-
-target_link_libraries(franka_gripper
-  ${Franka_LIBRARIES}
-  ${catkin_LIBRARIES}
-)
-
-target_include_directories(franka_gripper SYSTEM PUBLIC
-  ${Franka_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
-)
-target_include_directories(franka_gripper PUBLIC
-  include
-)
-
-add_executable(franka_gripper_node
-  src/franka_gripper_node.cpp
-)
-
-add_dependencies(franka_gripper_node
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-  franka_gripper
-)
-
-target_link_libraries(franka_gripper_node
-   ${catkin_LIBRARIES}
-   franka_gripper
-)
-
-target_include_directories(franka_gripper_node SYSTEM PUBLIC
-  ${catkin_INCLUDE_DIRS}
-)
-
-## Installation
-install(TARGETS franka_gripper
-                franka_gripper_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
-install(DIRECTORY launch
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
-install(DIRECTORY config
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
-
-## Tools
-include(${CMAKE_CURRENT_LIST_DIR}/../cmake/ClangTools.cmake OPTIONAL
-  RESULT_VARIABLE CLANG_TOOLS
-)
-if(CLANG_TOOLS)
-  file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-  file(GLOB_RECURSE HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
-  )
-  add_format_target(franka_gripper FILES ${SOURCES} ${HEADERS})
-  add_tidy_target(franka_gripper
-    FILES ${SOURCES}
-    DEPENDS franka_gripper franka_gripper_node
-  )
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+########################################
+# Find packages
+# ROS relevant
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(control_msgs REQUIRED)
+find_package(action_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+# Franka relevant
+find_package(Franka REQUIRED)
+
+########################################
+# Build
+# Actions and messages
+set(action_files
+    "action/Grasp.action"
+    "action/Homing.action"
+    "action/Move.action"
+    "action/Stop.action"
+)
+
+set(message_files
+    "msg/GraspEpsilon.msg"
+)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+    ${action_files}
+    ${message_files}
+    DEPENDENCIES action_msgs builtin_interfaces std_msgs
+)
+
+ament_export_dependencies(rosidl_default_generators)
+
+# Action server
+include_directories(
+    include
+)
+add_library(franka_gripper_server SHARED
+    src/franka_gripper_server.cpp
+)
+target_compile_definitions(franka_gripper_server
+    PRIVATE "FRANKA_GRIPPER_SERVER_BUILDING_DLL"
+)
+ament_target_dependencies(franka_gripper_server
+    "rclcpp"
+    "rclcpp_components"
+    "rclcpp_action"
+)
+rosidl_target_interfaces(franka_gripper_server
+    ${PROJECT_NAME} "rosidl_typesupport_cpp"
+)
+target_link_libraries(
+    franka_gripper_server
+    Franka::Franka
+)
+rclcpp_components_register_nodes(franka_gripper_server
+    "franka_gripper::FrankaGripperServer"
+)
+########################################
+# Install
+install(TARGETS
+    franka_gripper_server
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+ament_package()
