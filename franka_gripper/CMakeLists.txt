@@ -18,6 +18,7 @@ find_package(builtin_interfaces REQUIRED)
 find_package(control_msgs REQUIRED)
 find_package(action_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 # Franka relevant
 find_package(Franka REQUIRED)
 
@@ -57,6 +58,7 @@ ament_target_dependencies(franka_gripper_server
     "rclcpp"
     "rclcpp_components"
     "rclcpp_action"
+    "sensor_msgs"
 )
 rosidl_target_interfaces(franka_gripper_server
     ${PROJECT_NAME} "rosidl_typesupport_cpp"
