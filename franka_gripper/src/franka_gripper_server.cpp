@@ -4,9 +4,6 @@
 */
 #include <franka_gripper/franka_gripper_server.hpp>
 
-#include <functional>
-#include <chrono>
-
 using namespace std::placeholders;
 using namespace std::chrono_literals;
 
@@ -18,7 +15,7 @@ FrankaGripperServer::FrankaGripperServer(const rclcpp::NodeOptions& options)
 {
     RCLCPP_INFO(this->get_logger(), "Starting up franka_gripper_server");
     // Declare Parameters
-    this->declare_parameter<std::string>("robot_ip", "172.16.0.2");
+    this->declare_parameter<std::string>("robot_ip", "10.0.0.2");
     this->declare_parameter<double>("default_speed", 0.1);
     std::map<std::string, double> default_grasp_epsilon_map = {
         {"inner", 0.005},
@@ -49,6 +46,17 @@ FrankaGripperServer::FrankaGripperServer(const rclcpp::NodeOptions& options)
         RCLCPP_ERROR(this->get_logger(), ex.what());
         return;
     }
+
+    // Initialize joint state message
+    current_joint_state_.name = joint_names_;
+    current_joint_state_.position = {0., 0.};
+    current_joint_state_.velocity = {0., 0.};
+    current_joint_state_.effort = {0., 0.};
+    publisher_ = create_publisher<sensor_msgs::msg::JointState>("joint_states", 1);
+    timer = create_wall_timer(
+        std::chrono::duration<double>(1./publish_rate_),
+        std::bind(&FrankaGripperServer::on_timer, this)
+    );
 
     // Start action servers
     this->grasp_action_server_ = rclcpp_action::create_server<Grasp>(
@@ -91,6 +99,18 @@ FrankaGripperServer::FrankaGripperServer(const rclcpp::NodeOptions& options)
         std::bind(&FrankaGripperServer::handle_stop_cancel_, this, _1),
         std::bind(&FrankaGripperServer::handle_stop_accepted_, this, _1)
     );
+}
+
+// Publish timer
+void FrankaGripperServer::on_timer()
+{
+    current_joint_state_.header.stamp = rclcpp::Clock().now();
+    current_gripper_state_ = gripper_->readOnce();
+    for (size_t i = 0; i < joint_names_.size(); i++)
+    {
+        current_joint_state_.position[i] = current_gripper_state_.width * 0.5;
+    }
+    publisher_->publish(current_joint_state_);
 }
 
 // Grasp action

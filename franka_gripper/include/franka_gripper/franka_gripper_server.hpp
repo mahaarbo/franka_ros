@@ -4,9 +4,13 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <map>
+#include <functional>
+#include <chrono>
 
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp/clock.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
 
 #include "franka_gripper/msg/grasp_epsilon.hpp"
@@ -14,6 +18,8 @@
 #include "franka_gripper/action/homing.hpp"
 #include "franka_gripper/action/move.hpp"
 #include "franka_gripper/action/stop.hpp"
+
+#include "sensor_msgs/msg/joint_state.hpp"
 
 #include "franka/gripper.h"
 #include "franka/exception.h"
@@ -94,5 +100,11 @@ private:
     void handle_stop_accepted_(const std::shared_ptr<StopGoalHandle> goal_handle);
     void stop_execute_(const std::shared_ptr<StopGoalHandle> goal_handle);
 
+    // Gripper joint state publisher
+    rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publisher_;
+    sensor_msgs::msg::JointState current_joint_state_;
+    franka::GripperState current_gripper_state_;
+    rclcpp::TimerBase::SharedPtr timer;
+    void on_timer();
 }; // class FrankaGripperServer
 } // franka_gripper
