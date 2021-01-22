@@ -1,21 +1,37 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.5)
 project(franka_hw)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
-find_package(catkin REQUIRED COMPONENTS
-  actionlib
-  controller_interface
-  combined_robot_hw
-  hardware_interface
-  joint_limits_interface
-  roscpp
-  pluginlib
-  urdf
-  franka_msgs
-  message_generation
-)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+########################################
+# Find packages
+# ROS relevant
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(franka_msgs REQUIRED)
+find_package(hardware_interface REQUIRED)
+find_package(joint_limits_interface REQUIRED)
+find_package(controller_interface REQUIRED)
+# Franka relevant
+find_package(Franka REQUIRED)
+
+
+#find_package(catkin REQUIRED COMPONENTS
+#  actionlib
+  #controller_interface
+  #combined_robot_hw
+  #hardware_interface
+  #joint_limits_interface
+  #roscpp
+  #pluginlib
+#  urdf
+  #franka_msgs
+  #message_generation
+#)
 
 find_package(Franka 0.7.0 REQUIRED)
 
