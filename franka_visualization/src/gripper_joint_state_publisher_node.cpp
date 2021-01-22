@@ -21,7 +21,7 @@ int main (int argc, char * argv[])
     rclcpp::NodeOptions options;
     // Start the gripper joint state publisher component
     try
-        {
+    {
         auto gripper_joint_state_publisher = std::make_shared<franka_visualization::GripperJointStatePublisher>(options);
         exec.add_node(gripper_joint_state_publisher);
         exec.spin();
