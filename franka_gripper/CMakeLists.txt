@@ -70,6 +70,19 @@ target_link_libraries(
 rclcpp_components_register_nodes(franka_gripper_server
     "franka_gripper::FrankaGripperServer"
 )
+
+# Action server node
+add_executable(franka_gripper_node
+    src/franka_gripper_node.cpp
+)
+target_link_libraries(
+    franka_gripper_node
+    franka_gripper_server
+)
+ament_target_dependencies(franka_gripper_node
+    "rclcpp"
+    "Franka"
+)
 ########################################
 # Install
 install(TARGETS
@@ -77,5 +90,9 @@ install(TARGETS
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
+)
+install(TARGETS
+    franka_gripper_node
+    DESTINATION lib/${PROJECT_NAME}
 )
 ament_package()

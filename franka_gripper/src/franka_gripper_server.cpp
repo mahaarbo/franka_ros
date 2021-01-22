@@ -46,16 +46,27 @@ FrankaGripperServer::FrankaGripperServer(const rclcpp::NodeOptions& options)
         RCLCPP_ERROR(this->get_logger(), ex.what());
         return;
     }
+    
+    // Setup callback groups
+    cb_group1_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+    cb_group2_ = this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
 
+    // Make read state timer
+    gripper_state_timer_ = create_wall_timer(
+        std::chrono::duration<double>(0.1),
+        std::bind(&FrankaGripperServer::on_gripper_state_timer_, this),
+        cb_group1_
+    );
     // Initialize joint state message
     current_joint_state_.name = joint_names_;
     current_joint_state_.position = {0., 0.};
     current_joint_state_.velocity = {0., 0.};
     current_joint_state_.effort = {0., 0.};
     publisher_ = create_publisher<sensor_msgs::msg::JointState>("joint_states", 1);
-    timer = create_wall_timer(
+    timer_ = create_wall_timer(
         std::chrono::duration<double>(1./publish_rate_),
-        std::bind(&FrankaGripperServer::on_timer, this)
+        std::bind(&FrankaGripperServer::on_timer_, this),
+        cb_group2_
     );
 
     // Start action servers
@@ -102,15 +113,30 @@ FrankaGripperServer::FrankaGripperServer(const rclcpp::NodeOptions& options)
 }
 
 // Publish timer
-void FrankaGripperServer::on_timer()
+void FrankaGripperServer::on_timer_()
 {
+    std::lock_guard<std::mutex> lock(gripper_state_mutex_);
     current_joint_state_.header.stamp = rclcpp::Clock().now();
-    current_gripper_state_ = gripper_->readOnce();
     for (size_t i = 0; i < joint_names_.size(); i++)
     {
         current_joint_state_.position[i] = current_gripper_state_.width * 0.5;
     }
     publisher_->publish(current_joint_state_);
+    
+}
+
+// Read gripper state timer
+void FrankaGripperServer::on_gripper_state_timer_()
+{
+    std::lock_guard<std::mutex> lock(gripper_state_mutex_);
+    try
+    {
+        current_gripper_state_ = gripper_->readOnce();
+    }
+    catch (const franka::Exception& ex)
+    {
+        RCLCPP_ERROR(get_logger(), std::string("Exception reading gripper state:") + ex.what());
+    }
 }
 
 // Grasp action
