@@ -8,6 +8,8 @@
 #include <map>
 #include <functional>
 #include <chrono>
+#include <mutex>
+#include <thread>
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/clock.hpp>
@@ -104,7 +106,14 @@ private:
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publisher_;
     sensor_msgs::msg::JointState current_joint_state_;
     franka::GripperState current_gripper_state_;
-    rclcpp::TimerBase::SharedPtr timer;
-    void on_timer();
+    std::mutex gripper_state_mutex_;
+    rclcpp::TimerBase::SharedPtr timer_;
+    void on_timer_();
+    rclcpp::TimerBase::SharedPtr gripper_state_timer_;
+    void on_gripper_state_timer_();
+
+    // Since gripper state is read in separate thread, we'll use 2 callback groups
+    rclcpp::CallbackGroup::SharedPtr cb_group1_;
+    rclcpp::CallbackGroup::SharedPtr cb_group2_;
 }; // class FrankaGripperServer
 } // franka_gripper
