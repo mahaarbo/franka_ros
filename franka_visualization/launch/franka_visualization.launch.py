@@ -7,7 +7,8 @@ import launch.substitutions
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-
+from launch_ros.actions import ComposableNodeContainer
+from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
     """Generate launch description with franka_visualization component"""
@@ -51,16 +52,16 @@ def generate_launch_description():
     # Visualization Node
     rviz_node = Node(
         package="rviz2",
-        node_executable="rviz2",
-        node_name="rviz2",
+        executable="rviz2",
+        name="rviz2",
         output="screen",
         arguments=["-d", rviz_config]
     )
     # Robot description and TF publisher
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
-        node_executable="robot_state_publisher",
-        node_name="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher",
         output="screen",
         arguments=[urdf_without_gripper_path],
         condition=no_gripper_condition
@@ -68,8 +69,8 @@ def generate_launch_description():
     # Robot description and TF publisher with gripper
     robot_state_publisher_gripper_node = Node(
         package="robot_state_publisher",
-        node_executable="robot_state_publisher",
-        node_name="robot_state_publisher",
+        executable="robot_state_publisher",
+        name="robot_state_publisher",
         output="screen",
         arguments=[urdf_with_gripper_path],
         condition=gripper_condition
@@ -82,10 +83,10 @@ def generate_launch_description():
     )
     robot_joint_state_publisher_node = Node(
         package="franka_visualization",
-        node_executable="robot_joint_state_publisher",
+        executable="robot_joint_state_publisher",
         output="screen",
-        node_name="robot_joint_state_publisher",
-        node_namespace="robot_joint_state_publisher",
+        name="robot_joint_state_publisher",
+        namespace="robot_joint_state_publisher",
         parameters=[
             {
                 "robot_ip": LaunchConfiguration("robot_ip"),
@@ -100,33 +101,48 @@ def generate_launch_description():
         "config",
         "gripper_settings.yaml"
     )
-    gripper_joint_state_publisher_node = Node(
-        package="franka_visualization",
-        node_executable="gripper_joint_state_publisher",
+    # gripper_joint_state_publisher_node = Node(
+    #     package="franka_visualization",
+    #     node_executable="gripper_joint_state_publisher",
+    #     output="screen",
+    #     node_name="gripper_joint_state_publisher",
+    #     node_namespace="gripper_joint_state_publisher",
+    #     parameters=[
+    #         {
+    #             "robot_ip": LaunchConfiguration("robot_ip"),
+    #             "publish_rate": LaunchConfiguration("publish_rate")
+    #         },
+    #         gripper_joint_state_publisher_config
+    #     ],
+    #     condition=gripper_condition
+    # )
+    gripper_joint_action_server = Node(
+        package="franka_gripper",
+        executable="franka_gripper_node",
         output="screen",
-        node_name="gripper_joint_state_publisher",
-        node_namespace="gripper_joint_state_publisher",
+        name="franka_gripper_node",
+        namespace="franka_gripper_node",
         parameters=[
             {
                 "robot_ip": LaunchConfiguration("robot_ip"),
                 "publish_rate": LaunchConfiguration("publish_rate")
-            },
-            gripper_joint_state_publisher_config
-        ],
-        condition=gripper_condition
+            }
+        ]
+
     )
     # Join the joint states of the gripper and the robot
     joint_state_publisher_node = Node(
         package="joint_state_publisher",
-        node_executable="joint_state_publisher",
+        executable="joint_state_publisher",
         output="screen",
-        node_name="joint_state_publisher",
+        name="joint_state_publisher",
         parameters=[
             {
                 "rate": LaunchConfiguration("publish_rate"),
                 "source_list": [
                     "robot_joint_state_publisher/joint_states",
-                    "gripper_joint_state_publisher/joint_states"
+                    #"gripper_joint_state_publisher/joint_states"
+                    "franka_gripper_node/joint_states"
                 ]
             }
         ]
@@ -139,6 +155,7 @@ def generate_launch_description():
         robot_state_publisher_node,
         robot_state_publisher_gripper_node,
         robot_joint_state_publisher_node,
-        gripper_joint_state_publisher_node,
+        gripper_joint_action_server,
+        #gripper_joint_state_publisher_node,
         joint_state_publisher_node
     ])
