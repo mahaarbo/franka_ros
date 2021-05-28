@@ -1,0 +1,9 @@
+<library path="franka_hw">
+  <class name="franka_hw/FrankaHW"
+         type="franka_hw::FrankaHW"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      A robot hardware interface class for franka robots.
+    </description>
+  </class>
+</library>

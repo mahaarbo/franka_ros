@@ -1,0 +1,34 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 1000 # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    forward_command_controller_position:
+      type: forward_command_controller/ForwardCommandController
+    forward_command_controller_velocity:
+      type: forward_command_controller/ForwardCommandController
+
+forward_command_controller_position:
+  ros__parameters:
+    joints:
+      - panda_joint1
+      - panda_joint2
+      - panda_joint3
+      - panda_joint4
+      - panda_joint5
+      - panda_joint6
+      - panda_joint7
+    interface_name: position
+
+forward_command_controller_velocity:
+  ros__parameters:
+    joints:
+      - panda_joint1
+      - panda_joint2
+      - panda_joint3
+      - panda_joint4
+      - panda_joint5
+      - panda_joint6
+      - panda_joint7
+    interface_name: velocity
