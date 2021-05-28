@@ -45,7 +45,7 @@ target_link_libraries(
   franka_hw
   Franka::Franka
 )
-pluginlib_export_plugin_description_file(hardware_interface franka_hw.xml)
+pluginlib_export_plugin_description_file(hardware_interface franka_hw_plugin.xml)
 
 ########################################
 # INSTALL
@@ -68,28 +68,10 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 endif()
 
-## EXPORTS<<<<<<< HEAD
-find_package(franka_msgs REQUIRED)
-find_package(hardware_interface REQUIRED)
-find_package(joint_limits_interface REQUIRED)
-find_package(controller_interface REQUIRED)
-# Franka relevant
-find_package(Franka REQUIRED)
-
-
-#find_package(catkin REQUIRED COMPONENTS
-#  actionlib
-  #controller_interface
-  #combined_robot_hw
-  #hardware_interface
-  #joint_limits_interface
-  #roscpp
-  #pluginlib
-#  urdf
-  #franka_msgs
-  #message_generation
-#)
-=======
+## EXPORTS
+ament_export_include_directories(
+  include
+)
 ament_export_libraries(
   franka_hw
 )

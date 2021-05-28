@@ -237,17 +237,17 @@ return_type FrankaHW::configure(
       return return_type::ERROR;
     }
 
-    if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY) {
+    if (joint.command_interfaces[1].name != hardware_interface::HW_IF_VELOCITY) {
       RCLCPP_FATAL(rclcpp::get_logger("FrankaHW"),
-                   "Joint '%s' has '%s' found as first command interface. '%s' expected",
+                   "Joint '%s' has '%s' found as second command interface. '%s' expected",
                    joint.name.c_str(), joint.command_interfaces[0].name.c_str(),
                    hardware_interface::HW_IF_VELOCITY);
       return return_type::ERROR;
     }
 
-    if (joint.command_interfaces[0].name != hardware_interface::HW_IF_EFFORT) {
+    if (joint.command_interfaces[2].name != hardware_interface::HW_IF_EFFORT) {
       RCLCPP_FATAL(rclcpp::get_logger("FrankaHW"),
-                   "Joint '%s' has '%s' found as first command interface. '%s' expected",
+                   "Joint '%s' has '%s' found as third command interface. '%s' expected",
                    joint.name.c_str(), joint.command_interfaces[0].name.c_str(),
                    hardware_interface::HW_IF_EFFORT);
       return return_type::ERROR;
@@ -268,7 +268,7 @@ return_type FrankaHW::configure(
       return return_type::ERROR;
     }
 
-    if (joint.state_interfaces[0].name != hardware_interface::HW_IF_VELOCITY) {
+    if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY) {
       RCLCPP_FATAL(rclcpp::get_logger("FrankaHW"),
                    "Joint '%s' has '%s' found as first state interface. '%s' expected",
                    joint.name.c_str(), joint.state_interfaces[0].name.c_str(),
@@ -276,7 +276,7 @@ return_type FrankaHW::configure(
       return return_type::ERROR;
     }
 
-    if (joint.state_interfaces[0].name != hardware_interface::HW_IF_EFFORT) {
+    if (joint.state_interfaces[2].name != hardware_interface::HW_IF_EFFORT) {
       RCLCPP_FATAL(rclcpp::get_logger("FrankaHW"),
                    "Joint '%s' has '%s' found as first state interface. '%s' expected",
                    joint.name.c_str(), joint.state_interfaces[0].name.c_str(),
@@ -347,8 +347,14 @@ return_type FrankaHW::start()
                  error.what());
     return return_type::ERROR;
   }
-  robot_ = std::make_unique<franka::Robot>(robot_ip_, realtime_config_);
-  model_ = std::make_unique<franka::Model>(robot_->loadModel());
+  status_ = hardware_interface::status::STARTED;
+  return return_type::OK;
+}
+
+return_type FrankaHW::stop()
+{
+  controller_active_ = false;
+  status_ = hardware_interface::status::STOPPED;
   return return_type::OK;
 }
 
@@ -532,7 +538,6 @@ return_type FrankaHW::perform_command_mode_switch(
 }  // namespace franka_hw
 
 #include "pluginlib/class_list_macros.hpp"
-
 PLUGINLIB_EXPORT_CLASS(
   franka_hw::FrankaHW,
   hardware_interface::SystemInterface)
