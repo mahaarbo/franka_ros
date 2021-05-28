@@ -5,11 +5,19 @@
 See the [Franka Control Interface (FCI) documentation][fci-docs] for more information.
 
 ## ROS 2
-`libfranka` must be installed locally and you must use the correct version. Use the cmake cache entry `-DFranka_DIR:PATH=/path/to/libfranka/build`.
+`libfranka` must be installed locally and you must use the correct version. Use the cmake cache entry `-DFranka_DIR:PATH=/path/to/libfranka/build` when running colcon build.
 
-As xacro integration in ros2 is not complete for python-based launch scripts, urdfs are included for Franka Emika Panda with and without gripper. 
+To run the franka visualization:
 
-For ROS 2 Eloquent and Dashing, there are URDFs included instead of using the xacro. For Foxy and above, the `command` method can be used to generate the URDFs from the xacro. 
+1. build and source with [`ros2_control`][ros2control]
+2. Test the visualizer with `ros2 launch franka_visualization franka_visualization.launch.py robot_ip:=<fci-ip>`
+3. Test the hardware interface with `ros2 launch franka_hw franka_hw_test.launch.py robot_ip:=<fci-ip>` 
+    1. In a different terminal run `ros2 control load_controller --set_state start joint_state_broadcaster` to get the joint states
+    2. Then run `ros2 control load_controller --set_state start forward_command_controller_velocity`
+    3. Publish some joint velocity commands to test it out
+    4. Switch to `forward_command_controller_position` and be ready on the emergency stop, because that one does not work quite yet.
+
+4. Test the `franka_gripper` action server (Did not work yet)
 
 ## License
 
@@ -19,3 +27,4 @@ All packages of `franka_ros` are licensed under the [Apache 2.0 license][apache-
 [fci-docs]: https://frankaemika.github.io/docs
 [travis-status]: https://travis-ci.org/frankaemika/franka_ros.svg?branch=kinetic-devel
 [travis]: https://travis-ci.org/frankaemika/franka_ros
+[ros2control]:https://github.com/ros-controls/ros2_control/
