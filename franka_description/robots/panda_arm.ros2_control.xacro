@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="panda_arm_ros2_control" params="arm_id robot_ip">
+    <ros2_control name="${arm_id}" type="system">
+      <hardware>
+        <plugin>franka_hw/FrankaHW</plugin>
+
+        <param name="arm_id">${arm_id}</param>
+        <param name="robot_ip">${robot_ip}</param>
+        
+        <!-- Activate rate limiter? [true|false] -->
+        <param name="rate_limiting">true</param>
+        <!-- Cutoff frequency of the low-pass filter. Set to >= 1000 to deactivate. -->
+        <param name="cutoff_frequency">100.0</param>
+        <!-- Internal controller for motion generators [joint_impedance|cartesian_impedance] -->
+        <param name="internal_controller">joint_impedance</param>
+        <!-- Configure the threshold angle for printing joint limit warnings. (NOT SUPPORTED YET) -->
+        <param name="joint_limit_warning_threshold">0.1</param> <!-- [rad]-->
+        <!-- Used to decide whether to enforce realtime mode [enforce|ignore] -->
+        <param name="realtime_config">enforce</param>
+        
+        <!-- Collision config-->        
+        <param name="lower_torque_thresholds_acceleration0">20.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_acceleration1">20.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_acceleration2">18.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_acceleration3">18.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_acceleration4">16.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_acceleration5">14.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_acceleration6">12.0</param> <!-- [Nm]-->
+        
+        <param name="upper_torque_thresholds_acceleration0">20.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_acceleration1">20.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_acceleration2">18.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_acceleration3">18.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_acceleration4">16.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_acceleration5">14.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_acceleration6">12.0</param> <!-- [Nm]-->
+        
+        <param name="lower_torque_thresholds_nominal0">20.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_nominal1">20.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_nominal2">18.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_nominal3">18.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_nominal4">16.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_nominal5">14.0</param> <!-- [Nm]-->
+        <param name="lower_torque_thresholds_nominal6">12.0</param> <!-- [Nm]-->
+        
+        <param name="upper_torque_thresholds_nominal0">20.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_nominal1">20.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_nominal2">18.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_nominal3">18.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_nominal4">16.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_nominal5">14.0</param> <!-- [Nm]-->
+        <param name="upper_torque_thresholds_nominal6">12.0</param> <!-- [Nm]-->
+        
+        <param name="lower_force_thresholds_acceleration0">20.0</param> <!-- [N]-->
+        <param name="lower_force_thresholds_acceleration1">20.0</param> <!-- [N]-->
+        <param name="lower_force_thresholds_acceleration2">20.0</param> <!-- [N]-->
+        <param name="lower_force_thresholds_acceleration3">25.0</param> <!-- [Nm]-->
+        <param name="lower_force_thresholds_acceleration4">25.0</param> <!-- [Nm]-->
+        <param name="lower_force_thresholds_acceleration5">25.0</param> <!-- [Nm]-->
+        
+        <param name="upper_force_thresholds_acceleration0">20.0</param> <!-- [N]-->
+        <param name="upper_force_thresholds_acceleration1">20.0</param> <!-- [N]-->
+        <param name="upper_force_thresholds_acceleration2">20.0</param> <!-- [N]-->
+        <param name="upper_force_thresholds_acceleration3">25.0</param> <!-- [Nm]-->
+        <param name="upper_force_thresholds_acceleration4">25.0</param> <!-- [Nm]-->
+        <param name="upper_force_thresholds_acceleration5">25.0</param> <!-- [Nm]-->
+        
+        <param name="lower_force_thresholds_nominal0">20.0</param> <!-- [N]-->
+        <param name="lower_force_thresholds_nominal1">20.0</param> <!-- [N]-->
+        <param name="lower_force_thresholds_nominal2">20.0</param> <!-- [N]-->
+        <param name="lower_force_thresholds_nominal3">25.0</param> <!-- [Nm]-->
+        <param name="lower_force_thresholds_nominal4">25.0</param> <!-- [Nm]-->
+        <param name="lower_force_thresholds_nominal5">25.0</param> <!-- [Nm]-->
+        
+        <param name="upper_force_thresholds_nominal0">20.0</param> <!-- [N]-->
+        <param name="upper_force_thresholds_nominal1">20.0</param> <!-- [N]-->
+        <param name="upper_force_thresholds_nominal2">20.0</param> <!-- [N]-->
+        <param name="upper_force_thresholds_nominal3">25.0</param> <!-- [Nm]-->
+        <param name="upper_force_thresholds_nominal4">25.0</param> <!-- [Nm]-->
+        <param name="upper_force_thresholds_nominal5">25.0</param> <!-- [Nm]-->
+      </hardware>
+      <joint name="${arm_id}_joint1">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="${arm_id}_joint2">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="${arm_id}_joint3">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="${arm_id}_joint4">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="${arm_id}_joint5">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="${arm_id}_joint6">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      <joint name="${arm_id}_joint7">
+        <command_interface name="position"/>
+        <command_interface name="velocity"/>
+        <command_interface name="effort"/>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+    </ros2_control>
+  </xacro:macro>
+</robot>
