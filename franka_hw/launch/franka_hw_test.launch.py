@@ -89,7 +89,13 @@ def generate_launch_description():
   ))
   # Gripper action server 
   # TODO + combining joint_states from the two.
-
+  nodes.append(Node(
+    package="franka_gripper",
+    executable="franka_gripper_node",
+    output="both",
+    parameters=[{"robot_ip":robot_ip}],
+    condition=gripper_condition
+  ))
   # Controller manager
   nodes.append(Node(
     package="controller_manager",
@@ -97,8 +103,17 @@ def generate_launch_description():
     output="both",
     parameters=[
       {"robot_description": urdf_without_gripper},
-      robot_controllers
-    ]
+      robot_controllers],
+    condition=no_gripper_condition
+  ))
+  nodes.append(Node(
+    package="controller_manager",
+    executable="ros2_control_node",
+    output="both",
+    parameters=[
+      {"robot_description": urdf_with_gripper},
+      robot_controllers],
+    condition=gripper_condition
   ))
   # RViz
   nodes.append(Node(
