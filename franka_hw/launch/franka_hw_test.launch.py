@@ -115,6 +115,12 @@ def generate_launch_description():
       robot_controllers],
     condition=gripper_condition
   ))
+  # joint states broadcaster
+  nodes.append(Node(
+    package="controller_manager",
+    executable="spawner.py",
+    arguments=["joint_state_broadcaster"]))
+
   # RViz
   nodes.append(Node(
     package="rviz2",
