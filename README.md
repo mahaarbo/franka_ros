@@ -12,10 +12,9 @@ To run the franka visualization:
 1. build and source with [`ros2_control`][ros2control]
 2. Test the visualizer with `ros2 launch franka_visualization franka_visualization.launch.py robot_ip:=<fci-ip>`
 3. Test the hardware interface with `ros2 launch franka_hw franka_hw_test.launch.py robot_ip:=<fci-ip>` 
-    1. In a different terminal run `ros2 control load_controller --set_state start joint_state_broadcaster` to get the joint states
-    2. Then run `ros2 control load_controller --set_state start forward_command_controller_velocity`
-    3. Publish some joint velocity commands to test it out
-    4. Switch to `forward_command_controller_position` and be ready on the emergency stop, because that one does not work quite yet.
+    1. Then run `ros2 control load_controller --set-state start forward_command_controller_velocity`
+    2. Publish some joint velocity commands to test it out
+    3. Switch to `forward_command_controller_position` and be ready on the emergency stop, because that one does not work quite yet.
 
 4. Test the `franka_gripper` action server (Did not work yet)
 
