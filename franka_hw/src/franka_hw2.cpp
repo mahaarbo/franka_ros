@@ -154,7 +154,10 @@ void FrankaHW::initRobot() {
                                collision_config_.upper_force_thresholds_acceleration,
                                collision_config_.lower_force_thresholds_nominal,
                                collision_config_.upper_force_thresholds_nominal);
-  update(robot_->readOnce());
+  {
+    std::lock_guard<std::mutex> ros_lock(ros_state_mutex_);
+    robot_state_ros_ = robot_->readOnce();
+  }
   control_loop_thread_ = std::make_unique<std::thread>(&FrankaHW::controlLoop, this);
 }
 
@@ -207,11 +210,6 @@ void FrankaHW::control() const {
     return;
   }
   run_function_(*robot_);
-}
-
-void FrankaHW::update(const franka::RobotState& robot_state) {
-  std::lock_guard<std::mutex> ros_lock(ros_state_mutex_);
-  robot_state_ros_ = robot_state;
 }
 
 return_type FrankaHW::configure(

@@ -51,13 +51,6 @@ public:
   virtual bool initParameters();
   
   /**
-   * Updates the controller interfaces from the given robot state.
-   *
-   * @param[in] robot_state Current robot state.
-   */
-  virtual void update(const franka::RobotState& robot_state);
-
-  /**
    * Runs the currently active controller in a realtime loop. If no controller is active, the
    * function immediately exits.
    * 
