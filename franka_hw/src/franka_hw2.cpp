@@ -167,10 +167,8 @@ void FrankaHW::controlLoop() {
       // TODO: !controllerActive debug print, has_error_ debug print, should clock be instantiated in init?
 
       {
-        std::lock_guard<std::mutex> ros_state_lock(ros_state_mutex_);
         std::lock_guard<std::mutex> libfranka_state_lock(libfranka_state_mutex_);
         robot_state_libfranka_ = robot_->readOnce();
-        robot_state_ros_ = robot_->readOnce();
       }
 
       if (!rclcpp::ok) {
@@ -181,7 +179,7 @@ void FrankaHW::controlLoop() {
     {
       std::lock_guard<std::mutex> command_lock(libfranka_cmd_mutex_);
       std::lock_guard<std::mutex> libfranka_state_lock(libfranka_state_mutex_);
-      position_joint_command_ros_ = franka::JointPositions({
+      position_joint_command_libfranka_ = franka::JointPositions({
         robot_state_libfranka_.q[0],
         robot_state_libfranka_.q[1],
         robot_state_libfranka_.q[2],
@@ -189,8 +187,8 @@ void FrankaHW::controlLoop() {
         robot_state_libfranka_.q[4],
         robot_state_libfranka_.q[5],
         robot_state_libfranka_.q[6]});
-      velocity_joint_command_ros_ = franka::JointVelocities({0., 0., 0., 0., 0., 0., 0.});
-      effort_joint_command_ros_ = franka::Torques({0., 0., 0., 0., 0., 0., 0.});
+      velocity_joint_command_libfranka_ = franka::JointVelocities({0., 0., 0., 0., 0., 0., 0.});
+      effort_joint_command_libfranka_ = franka::Torques({0., 0., 0., 0., 0., 0., 0.});
     }
 
     try {
