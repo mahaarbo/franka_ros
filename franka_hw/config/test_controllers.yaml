@@ -8,6 +8,8 @@ controller_manager:
       type: forward_command_controller/ForwardCommandController
     forward_command_controller_velocity:
       type: forward_command_controller/ForwardCommandController
+    joint_position_example_controller:
+      type: franka_example_controllers/JointPositionExampleController
 
 forward_command_controller_position:
   ros__parameters:
@@ -32,3 +34,14 @@ forward_command_controller_velocity:
       - panda_joint6
       - panda_joint7
     interface_name: velocity
+
+joint_position_example_controller:
+  ros__parameters:
+    joints:
+      - panda_joint1
+      - panda_joint2
+      - panda_joint3
+      - panda_joint4
+      - panda_joint5
+      - panda_joint6
+      - panda_joint7

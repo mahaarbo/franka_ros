@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>franka_example_controllers</name>
   <version>0.7.0</version>
   <description>franka_example_controllers provides example code for controlling Franka Emika research robots with ros_control</description>
@@ -11,9 +11,30 @@
   <url type="bugtracker">https://github.com/frankaemika/franka_ros/issues</url>
   <author>Franka Emika GmbH</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>message_generation</build_depend>
+  <build_depend>angles</build_depend>
+  <build_depend>pluginlib</build_depend>
+  <build_depend>rcutils</build_depend>
+  <build_depend>realtime_tools</build_depend>
+
+  <exec_depend>angles</exec_depend>
+  <exec_depend>pluginlib</exec_depend>
+  <exec_depend>rcutils</exec_depend>
+  <exec_depend>realtime_tools</exec_depend>
+
+  <depend>controller_interface</depend>
+  <depend>control_msgs</depend>
+  <depend>hardware_interface</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>controller_manager</test_depend>
+
+  <!--<build_depend>message_generation</build_depend>
   <build_depend>eigen</build_depend>
 
   <build_export_depend>message_runtime</build_export_depend>
@@ -35,9 +56,9 @@
   <exec_depend>franka_description</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>panda_moveit_config</exec_depend>
-  <exec_depend>rospy</exec_depend>
+  <exec_depend>rospy</exec_depend>-->
 
   <export>
-    <controller_interface plugin="${prefix}/franka_example_controllers_plugin.xml"/>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
