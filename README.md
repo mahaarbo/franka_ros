@@ -18,6 +18,8 @@ To run the franka visualization:
 
 4. Test the `franka_gripper` action server (Did not work yet)
 
+Note: This is still in very early developments, and the packages are cluttered with both the new and the old implementations. To see which files are in use, check whether there is a `COLCON_IGNORE` file in the folder, and if there isn't, check the `CMakeLists.txt` to see which files are actually used. Basic control of the robot in joint velocity and joint torque is possible, but there are still things that must be further developed in `ros2_control` and in this package before joint position, and the cartesian interface can be used.
+ 
 ## License
 
 All packages of `franka_ros` are licensed under the [Apache 2.0 license][apache-2.0].
