@@ -6,6 +6,7 @@
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include <unordered_map>
 #include <string>
+#include "franka/control_tools.h"
 
 namespace franka_hw
 {
@@ -350,6 +351,13 @@ return_type FrankaHW::start()
     RCLCPP_FATAL(rclcpp::get_logger("FrankaHW"),
                  "Failed to initialize libfranka robot. %s",
                  error.what());
+    return return_type::ERROR;
+  }
+  std::string error_message;
+  if (!franka::setCurrentThreadToHighestSchedulerPriority(&error_message)) {
+    RCLCPP_ERROR(rclcpp::get_logger("FrankaHW"),
+    "Failed to set thread priority to real-time. Error: %s",
+    error_message.c_str());
     return return_type::ERROR;
   }
   status_ = hardware_interface::status::STARTED;
